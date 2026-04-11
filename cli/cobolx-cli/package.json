@@ -1,0 +1,23 @@
+{
+  "name": "@cobolx/cli",
+  "version": "0.2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "cobolx": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "powershell -NoProfile -Command \"if (Test-Path dist) { Remove-Item -Recurse -Force dist }; tsc -p tsconfig.json; if (Test-Path 'dist\\\\cli\\\\cobolx-cli\\\\src') { Copy-Item -Recurse -Force 'dist\\\\cli\\\\cobolx-cli\\\\src\\\\*' dist }\"",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "clean": "if (Test-Path dist) { Remove-Item -Recurse -Force dist }"
+  },
+  "dependencies": {
+    "@cobolx/cargox": "0.2.0",
+    "@cobolx/compiler": "0.2.0",
+    "@cobolx/debugger": "0.2.0",
+    "@cobolx/formatter": "0.2.0",
+    "@cobolx/linter": "0.2.0",
+    "@cobolx/profiler": "0.2.0",
+    "@cobolx/runtime": "0.2.0"
+  }
+}

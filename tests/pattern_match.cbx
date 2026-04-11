@@ -1,0 +1,16 @@
+PROGRAM PatternMatch
+
+ENUM Result:
+OK(value)
+ERR(message)
+END
+
+BEGIN
+  LET result = OK(7)
+  MATCH result:
+  OK(value):
+    DISPLAY value
+  ERR(problem):
+    DISPLAY problem
+  END-MATCH
+END

@@ -1,0 +1,10 @@
+{
+  "name": "cobolx",
+  "version": "0.3.0-dev",
+  "artifacts": [
+    "compiler/dist",
+    "cli/cobolx-cli/dist",
+    "lsp/server/dist",
+    "vscode-extension/dist"
+  ]
+}

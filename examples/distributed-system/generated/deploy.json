@@ -1,0 +1,12 @@
+{
+  "service": "distributed-system",
+  "address": "node://distributed-system",
+  "status": {
+    "name": "distributed-system",
+    "healthy": true,
+    "details": {
+      "address": "node://distributed-system"
+    }
+  },
+  "discovered": "node://distributed-system"
+}

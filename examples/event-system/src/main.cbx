@@ -1,0 +1,11 @@
+PROGRAM EventSystem
+
+MACRO emitMessage(value)
+BEGIN
+  DISPLAY value
+END-MACRO
+
+BEGIN
+  emitMessage!("UserCreated")
+  DISPLAY "Listener handled event"
+END

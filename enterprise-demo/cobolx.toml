@@ -1,0 +1,7 @@
+[package]
+name = "enterprise-demo"
+version = "0.1.0"
+entry = "src/main.cbx"
+
+[dependencies]
+ledger = "1.2.0"

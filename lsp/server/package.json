@@ -1,0 +1,16 @@
+{
+  "name": "@cobolx/lsp",
+  "version": "0.2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "clean": "if (Test-Path dist) { Remove-Item -Recurse -Force dist }"
+  },
+  "dependencies": {
+    "@cobolx/compiler": "0.2.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
+  }
+}

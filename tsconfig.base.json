@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "paths": {
+      "@cobolx/compiler": ["compiler/src/index.ts"],
+      "@cobolx/cargox": ["cargox/src/index.ts"],
+      "@cobolx/runtime": ["runtime/src/index.ts"],
+      "@cobolx/formatter": ["formatter/src/index.ts"],
+      "@cobolx/linter": ["linter/src/index.ts"],
+      "@cobolx/debugger": ["debugger/src/index.ts"],
+      "@cobolx/profiler": ["profiler/src/index.ts"]
+    },
+    "sourceMap": true
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "service": "api-demo",
+  "address": "node://api-demo",
+  "status": {
+    "name": "api-demo",
+    "healthy": true,
+    "details": {
+      "address": "node://api-demo"
+    }
+  },
+  "discovered": "node://api-demo"
+}

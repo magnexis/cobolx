@@ -1,0 +1,75 @@
+{
+  "scopeName": "source.cobolx",
+  "name": "COBOLX",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#comments"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.cobolx",
+          "match": "\\b(PROGRAM|BEGIN|END|SET|LET|MUT|DISPLAY|INPUT|IF|THEN|ELSE|END-IF|FUNCTION|RETURN|END-FUNCTION|CONST|ENUM|TRAIT|IMPL|MODULE|EXPORT|IMPORT|FROM|AS|MATCH|END-MATCH|MACRO|END-MACRO|PLUGIN|TEST|END-TEST|ASYNC|SPAWN|ASSERT|UNSAFE|END-UNSAFE|TRUE|FALSE)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.cobolx",
+          "match": "\\b(STRING|INT|DECIMAL|BOOL|Result|Option)\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "entity.name.function.cobolx",
+          "match": "\\b([A-Za-z_][A-Za-z0-9_]*)\\s*(?=\\()"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.cobolx",
+          "begin": "\"",
+          "end": "\""
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.cobolx",
+          "match": "\\b\\d+(?:\\.\\d+)?\\b"
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.cobolx",
+          "match": "(\\*>|///).*$"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+import type { ProgramNode } from "../ast/types.js";
+import type { Token } from "../lexer/tokens.js";
+export declare class Parser {
+    private readonly tokens;
+    private index;
+    constructor(tokens: Token[]);
+    parseProgram(): ProgramNode;
+    private parseFunction;
+    private parseStatementsUntil;
+    private parseStatement;
+    private parseSetStatement;
+    private parseDisplayStatement;
+    private parseInputStatement;
+    private parseIfStatement;
+    private parseReturnStatement;
+    private parseExpression;
+    private parseComparison;
+    private parseTerm;
+    private parseFactor;
+    private parseUnary;
+    private parseCall;
+    private parsePrimary;
+    private binaryNode;
+    private match;
+    private consume;
+    private skipNewlines;
+    private check;
+    private checkAny;
+    private advance;
+    private peek;
+    private previous;
+    private mergeRanges;
+}

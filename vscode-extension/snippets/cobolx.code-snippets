@@ -1,0 +1,49 @@
+{
+  "Program": {
+    "prefix": "program",
+    "body": [
+      "PROGRAM ${1:Main}",
+      "",
+      "BEGIN",
+      "\t${2:DISPLAY \"Hello from COBOLX\"}",
+      "END"
+    ]
+  },
+  "If": {
+    "prefix": "if",
+    "body": [
+      "IF ${1:condition} THEN",
+      "\t${2:DISPLAY \"true\"}",
+      "ELSE",
+      "\t${3:DISPLAY \"false\"}",
+      "END-IF"
+    ]
+  },
+  "Function": {
+    "prefix": "function",
+    "body": [
+      "FUNCTION ${1:name}(${2:param})",
+      "BEGIN",
+      "\tRETURN ${3:param}",
+      "END-FUNCTION"
+    ]
+  },
+  "Match": {
+    "prefix": "match",
+    "body": [
+      "MATCH ${1:value}:",
+      "\t${2:OK(result)}:",
+      "\t\tDISPLAY ${3:result}",
+      "END-MATCH"
+    ]
+  },
+  "Enum": {
+    "prefix": "enum",
+    "body": [
+      "ENUM ${1:Result}:",
+      "\tOK(${2:value})",
+      "\tERR(${3:error})",
+      "END"
+    ]
+  }
+}

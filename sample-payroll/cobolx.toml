@@ -1,0 +1,3 @@
+name = "sample-payroll"
+version = "0.1.0"
+entry = "src/main.cbx"

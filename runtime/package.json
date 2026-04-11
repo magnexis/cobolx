@@ -1,0 +1,14 @@
+{
+  "name": "@cobolx/runtime",
+  "version": "0.2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "powershell -NoProfile -Command \"if (Test-Path dist) { Remove-Item -Recurse -Force dist }; tsc -p tsconfig.json; if (Test-Path 'dist\\\\runtime\\\\src') { Copy-Item -Recurse -Force 'dist\\\\runtime\\\\src\\\\*' dist }\"",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "clean": "if (Test-Path dist) { Remove-Item -Recurse -Force dist }"
+  },
+  "dependencies": {
+    "@cobolx/compiler": "0.2.0"
+  }
+}

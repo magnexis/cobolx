@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-cobolx-extension",
+      "type": "shell",
+      "command": "npm run build --workspace vscode-extension",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": "$tsc"
+    }
+  ]
+}

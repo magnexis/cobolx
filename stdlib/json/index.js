@@ -1,0 +1,7 @@
+export function encode(value) {
+  return JSON.stringify(value);
+}
+
+export function decode(text) {
+  return JSON.parse(text);
+}

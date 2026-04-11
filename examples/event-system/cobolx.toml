@@ -1,0 +1,6 @@
+[package]
+name = "event-system"
+version = "1.0.0"
+entry = "src/main.cbx"
+
+[dependencies]

@@ -1,0 +1,30 @@
+{
+  "name": "cobolx",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "compiler",
+    "runtime",
+    "cargox",
+    "cli/cobolx-cli",
+    "lsp/server",
+    "vscode-extension",
+    "formatter",
+    "linter",
+    "debugger",
+    "profiler"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "check": "npm run check --workspaces",
+    "clean": "npm run clean --workspaces --if-present",
+    "test": "node cli/cobolx-cli/dist/index.js test",
+    "bench": "node cli/cobolx-cli/dist/index.js bench",
+    "validate": "node tests/validate-release.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.3"
+  }
+}

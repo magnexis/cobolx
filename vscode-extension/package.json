@@ -1,0 +1,148 @@
+{
+  "name": "cobolx",
+  "displayName": "COBOL-X",
+  "description": "Language support, commands, and LSP integration for the COBOL-X programming language.",
+  "version": "1.2.0",
+  "publisher": "magnificent-language",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Magnexis/cobolx.git"
+  },
+  "homepage": "https://github.com/Magnexis/cobolx#readme",
+  "bugs": {
+    "url": "https://github.com/Magnexis/cobolx/issues"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "files": [
+    "dist",
+    "syntaxes",
+    "snippets",
+    "language-configuration.json",
+    "icon.png",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "cobolx",
+    "cobol",
+    "language",
+    "lsp",
+    "enterprise"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Debuggers"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "activationEvents": [
+    "onLanguage:cobolx",
+    "onCommand:cobolx.runFile",
+    "onCommand:cobolx.buildProject",
+    "onCommand:cobolx.openRepl",
+    "onCommand:cobolx.debugFile"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "cobolx",
+        "aliases": [
+          "COBOL-X",
+          "COBOLX",
+          "cobolx"
+        ],
+        "extensions": [
+          ".cbx",
+          ".cob",
+          ".col"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "cobolx",
+        "scopeName": "source.cobolx",
+        "path": "./syntaxes/cobolx.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "cobolx.runFile",
+        "title": "COBOL-X: Run File",
+        "category": "COBOL-X"
+      },
+      {
+        "command": "cobolx.buildProject",
+        "title": "COBOL-X: Build Project",
+        "category": "COBOL-X"
+      },
+      {
+        "command": "cobolx.openRepl",
+        "title": "COBOL-X: Open REPL",
+        "category": "COBOL-X"
+      },
+      {
+        "command": "cobolx.debugFile",
+        "title": "COBOL-X: Debug Current Project",
+        "category": "COBOL-X"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "cobolx.runFile",
+          "when": "resourceLangId == cobolx",
+          "group": "navigation"
+        },
+        {
+          "command": "cobolx.debugFile",
+          "when": "resourceLangId == cobolx",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "cobolx.runFile",
+          "when": "editorLangId == cobolx"
+        },
+        {
+          "command": "cobolx.buildProject",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "cobolx.openRepl"
+        },
+        {
+          "command": "cobolx.debugFile",
+          "when": "editorLangId == cobolx"
+        }
+      ]
+    },
+    "snippets": [
+      {
+        "language": "cobolx",
+        "path": "./snippets/cobolx.code-snippets"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "clean": "if (Test-Path dist) { Remove-Item -Recurse -Force dist }",
+    "package": "npx @vscode/vsce package --no-dependencies",
+    "publish:vsix": "npx @vscode/vsce publish --no-dependencies"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.6.2"
+  }
+}

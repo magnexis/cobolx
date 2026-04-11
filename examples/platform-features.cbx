@@ -1,0 +1,32 @@
+PROGRAM PlatformFeatures
+
+/// compile-time constant
+CONST LIMIT = 3
+
+ENUM Result:
+OK(value)
+ERR(message)
+END
+
+/// simple declarative macro
+MACRO say(value)
+BEGIN
+  DISPLAY value
+END-MACRO
+
+FUNCTION inspect(item)
+BEGIN
+  MATCH item:
+  OK(value):
+    say!("matched ok")
+    DISPLAY value
+  ERR(problem):
+    DISPLAY problem
+  END-MATCH
+  RETURN item?
+END-FUNCTION
+
+BEGIN
+  LET result = OK(LIMIT)
+  inspect(result)
+END
