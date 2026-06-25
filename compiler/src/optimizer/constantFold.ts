@@ -1,5 +1,6 @@
 import type { ExpressionNode, StatementNode } from "../ast/types.js";
 import type { MIRInstruction, MIRProgram } from "../mir/types.js";
+import { CobolxError } from "../diagnostics.js";
 
 function foldExpression(expression: ExpressionNode): ExpressionNode {
   switch (expression.kind) {
@@ -15,8 +16,22 @@ function foldExpression(expression: ExpressionNode): ExpressionNode {
           case "*":
             return { ...expression, kind: "NumberLiteral", value: left.value * right.value };
           case "/":
+            if (right.value === 0) {
+              throw new CobolxError({
+                message: "Division by zero in constant expression",
+                range: expression.range ?? { start: { line: 1, column: 1 }, end: { line: 1, column: 1 } },
+                severity: "error",
+              });
+            }
             return { ...expression, kind: "NumberLiteral", value: left.value / right.value };
           case "%":
+            if (right.value === 0) {
+              throw new CobolxError({
+                message: "Modulo by zero in constant expression",
+                range: expression.range ?? { start: { line: 1, column: 1 }, end: { line: 1, column: 1 } },
+                severity: "error",
+              });
+            }
             return { ...expression, kind: "NumberLiteral", value: left.value % right.value };
         }
       }
