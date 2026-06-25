@@ -1,0 +1,105 @@
+PROGRAM StringProcessing
+/// Demonstrates COBOL-X string handling built-in functions
+/// These mirror classic COBOL STRING/UNSTRING operations
+/// with modern conveniences.
+
+CONST GREETING = "  HELLO, COBOL-X WORLD  "
+
+FUNCTION demo_reverse() BEGIN
+  SET original = "STRESSED"
+  SET reversed = STRING_REVERSE(original)
+  DISPLAY "ORIGINAL : " + original
+  DISPLAY "REVERSED : " + reversed
+  DISPLAY "CHECK    : " + STRING_REVERSE(reversed)
+END-FUNCTION
+
+FUNCTION demo_case() BEGIN
+  SET text = "Hello COBOL-X World"
+  DISPLAY "ORIGINAL : " + text
+  DISPLAY "UPPER    : " + STRING_UPPER(text)
+  DISPLAY "LOWER    : " + STRING_LOWER(text)
+END-FUNCTION
+
+FUNCTION demo_trim() BEGIN
+  SET raw = "   padded string   "
+  DISPLAY "BOTH     : [" + STRING_TRIM(raw) + "]"
+  DISPLAY "LEADING  : [" + STRING_TRIM(raw, "LEADING") + "]"
+  DISPLAY "TRAILING : [" + STRING_TRIM(raw, "TRAILING") + "]"
+END-FUNCTION
+
+FUNCTION demo_split_and_join() BEGIN
+  SET csv = "NAME,AGE,CITY,COUNTRY"
+  DISPLAY "CSV LINE : " + csv
+  SET parts = STRING_SPLIT(csv, ",")
+  DISPLAY "SPLIT[0] : " + parts[0]
+  DISPLAY "SPLIT[1] : " + parts[1]
+  DISPLAY "SPLIT[2] : " + parts[2]
+  SET joined = STRING_JOIN(parts, " | ")
+  DISPLAY "JOINED   : " + joined
+END-FUNCTION
+
+FUNCTION demo_replace() BEGIN
+  SET template = "Dear {NAME}, your order {ID} is confirmed."
+  DISPLAY "TEMPLATE : " + template
+  SET step1 = STRING_REPLACE(template, "{NAME}", "Alice")
+  SET step2 = STRING_REPLACE(step1, "{ID}", "COB-0042")
+  DISPLAY "RESULT   : " + step2
+END-FUNCTION
+
+FUNCTION demo_contains() BEGIN
+  SET document = "COBOL-X is a modern COBOL-inspired language"
+  DISPLAY "DOC      : " + document
+  IF STRING_CONTAINS(document, "COBOL") = 1
+    DISPLAY "FOUND    : 'COBOL' is present"
+  END-IF
+  IF STRING_CONTAINS(document, "FORTRAN") = 0
+    DISPLAY "NOT FOUND: 'FORTRAN' is absent"
+  END-IF
+END-FUNCTION
+
+FUNCTION demo_substring_and_pad() BEGIN
+  SET record = "20250113ALICE               "
+  DISPLAY "RECORD   : [" + record + "]"
+  SET datePart = STRING_SUBSTRING(record, 1, 8)
+  DISPLAY "DATE     : " + datePart
+  SET name = STRING_SUBSTRING(record, 9, 5)
+  DISPLAY "NAME     : " + name
+  SET padded = STRING_PAD("123", 10, "0", "LEFT")
+  DISPLAY "PADDED   : [" + padded + "]"
+END-FUNCTION
+
+FUNCTION demo_length() BEGIN
+  SET words = "COBOL-X"
+  DISPLAY "TEXT     : " + words
+  DISPLAY "LENGTH   : " + STRING_LENGTH(words)
+END-FUNCTION
+
+BEGIN
+  DISPLAY "=== COBOL-X String Processing Demo ==="
+  DISPLAY ""
+  DISPLAY "--- STRING-REVERSE ---"
+  demo_reverse()
+  DISPLAY ""
+  DISPLAY "--- STRING-UPPER / STRING-LOWER ---"
+  demo_case()
+  DISPLAY ""
+  DISPLAY "--- STRING-TRIM ---"
+  demo_trim()
+  DISPLAY ""
+  DISPLAY "--- STRING-SPLIT / STRING-JOIN ---"
+  demo_split_and_join()
+  DISPLAY ""
+  DISPLAY "--- STRING-REPLACE ---"
+  demo_replace()
+  DISPLAY ""
+  DISPLAY "--- STRING-CONTAINS ---"
+  demo_contains()
+  DISPLAY ""
+  DISPLAY "--- STRING-SUBSTRING / STRING-PAD ---"
+  demo_substring_and_pad()
+  DISPLAY ""
+  DISPLAY "--- STRING-LENGTH ---"
+  demo_length()
+  DISPLAY ""
+  DISPLAY "=== Demo Complete ==="
+END

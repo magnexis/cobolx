@@ -1,0 +1,128 @@
+PROGRAM MathCalculations
+/// Demonstrates COBOL-X math built-in functions
+/// These extend the standard COMPUTE verb with advanced
+/// numerical operations commonly needed in business logic.
+
+CONST PI_APPROX = 3.14159265
+CONST TAX_RATE = 8.25
+
+FUNCTION demo_power() BEGIN
+  DISPLAY "2 ^ 10  = " + COMPUTE_POWER(2, 10)
+  DISPLAY "3 ^ 3   = " + COMPUTE_POWER(3, 3)
+  DISPLAY "9 ^ 0.5 = " + COMPUTE_POWER(9, 0.5)
+  DISPLAY "2 ^ -2  = " + COMPUTE_POWER(2, -2)
+END-FUNCTION
+
+FUNCTION demo_sqrt() BEGIN
+  DISPLAY "SQRT(144) = " + COMPUTE_SQRT(144)
+  DISPLAY "SQRT(2)   = " + COMPUTE_SQRT(2)
+  DISPLAY "SQRT(0)   = " + COMPUTE_SQRT(0)
+END-FUNCTION
+
+FUNCTION demo_abs() BEGIN
+  DISPLAY "ABS(-42)  = " + COMPUTE_ABS(-42)
+  DISPLAY "ABS(42)   = " + COMPUTE_ABS(42)
+  DISPLAY "ABS(0)    = " + COMPUTE_ABS(0)
+  DISPLAY "ABS(-3.7) = " + COMPUTE_ABS(-3.7)
+END-FUNCTION
+
+FUNCTION demo_mod() BEGIN
+  DISPLAY "17 MOD 5  = " + COMPUTE_MOD(17, 5)
+  DISPLAY "20 MOD 4  = " + COMPUTE_MOD(20, 4)
+  DISPLAY "-7 MOD 3  = " + COMPUTE_MOD(-7, 3)
+  DISPLAY "100 MOD 7 = " + COMPUTE_MOD(100, 7)
+END-FUNCTION
+
+FUNCTION demo_min_max() BEGIN
+  SET scores = [87, 92, 65, 99, 78, 100, 55]
+  DISPLAY "SCORES   : 87, 92, 65, 99, 78, 100, 55"
+  DISPLAY "MIN      : " + COMPUTE_MIN(scores)
+  DISPLAY "MAX      : " + COMPUTE_MAX(scores)
+  DISPLAY "MIN(3,1) : " + COMPUTE_MIN([3, 1])
+  DISPLAY "MAX(3,1) : " + COMPUTE_MAX([3, 1])
+END-FUNCTION
+
+FUNCTION demo_rounding() BEGIN
+  DISPLAY "ROUND(3.456, 2) = " + COMPUTE_ROUND(3.456, 2)
+  DISPLAY "ROUND(3.454, 2) = " + COMPUTE_ROUND(3.454, 2)
+  DISPLAY "ROUND(2.5, 0)   = " + COMPUTE_ROUND(2.5, 0)
+  DISPLAY "ROUND(-2.5, 0)  = " + COMPUTE_ROUND(-2.5, 0)
+  DISPLAY ""
+  DISPLAY "FLOOR(3.7)  = " + COMPUTE_FLOOR(3.7)
+  DISPLAY "FLOOR(-3.2) = " + COMPUTE_FLOOR(-3.2)
+  DISPLAY "CEIL(3.2)   = " + COMPUTE_CEIL(3.2)
+  DISPLAY "CEIL(-3.7)  = " + COMPUTE_CEIL(-3.7)
+END-FUNCTION
+
+FUNCTION demo_sign() BEGIN
+  DISPLAY "SIGN(-42) = " + COMPUTE_SIGN(-42)
+  DISPLAY "SIGN(0)   = " + COMPUTE_SIGN(0)
+  DISPLAY "SIGN(42)  = " + COMPUTE_SIGN(42)
+END-FUNCTION
+
+FUNCTION demo_clamp() BEGIN
+  DISPLAY "CLAMP(15, 0, 10) = " + COMPUTE_CLAMP(15, 0, 10)
+  DISPLAY "CLAMP(-5, 0, 10) = " + COMPUTE_CLAMP(-5, 0, 10)
+  DISPLAY "CLAMP(5, 0, 10)  = " + COMPUTE_CLAMP(5, 0, 10)
+END-FUNCTION
+
+FUNCTION demo_percentage() BEGIN
+  SET subtotal = 199.99
+  SET tax = COMPUTE_PERCENTAGE(subtotal, TAX_RATE)
+  DISPLAY "SUBTOTAL   : " + subtotal
+  DISPLAY "TAX RATE   : " + TAX_RATE + "%"
+  DISPLAY "TAX AMOUNT : " + COMPUTE_ROUND(tax, 2)
+  DISPLAY "TOTAL      : " + COMPUTE_ROUND(subtotal + tax, 2)
+END-FUNCTION
+
+FUNCTION demo_business_calc() BEGIN
+  DISPLAY ""
+  DISPLAY "--- Business Calculation Example ---"
+  SET principal = 10000
+  SET rate = 5
+  SET years = 3
+  SET total = principal
+  SET i = 1
+  WHILE i <= years
+    SET interest = COMPUTE_PERCENTAGE(total, rate)
+    SET total = total + interest
+    DISPLAY "YEAR " + i + ": BALANCE = " + COMPUTE_ROUND(total, 2)
+    SET i = i + 1
+  END-WHILE
+  DISPLAY "FINAL BALANCE     : " + COMPUTE_ROUND(total, 2)
+  DISPLAY "TOTAL INTEREST    : " + COMPUTE_ROUND(total - principal, 2)
+END-FUNCTION
+
+BEGIN
+  DISPLAY "=== COBOL-X Math Calculations Demo ==="
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-POWER ---"
+  demo_power()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-SQRT ---"
+  demo_sqrt()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-ABS ---"
+  demo_abs()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-MOD ---"
+  demo_mod()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-MIN / COMPUTE-MAX ---"
+  demo_min_max()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-ROUND / FLOOR / CEIL ---"
+  demo_rounding()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-SIGN ---"
+  demo_sign()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-CLAMP ---"
+  demo_clamp()
+  DISPLAY ""
+  DISPLAY "--- COMPUTE-PERCENTAGE ---"
+  demo_percentage()
+  demo_business_calc()
+  DISPLAY ""
+  DISPLAY "=== Demo Complete ==="
+END
