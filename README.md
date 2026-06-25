@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-blue)](#release)
 [![VS Code Extension](https://img.shields.io/badge/vscode_extension-1.2.0-007acc)](#vs-code-extension)
 [![License](https://img.shields.io/badge/license-MIT-black)](./LICENSE)
+[![npm](https://img.shields.io/npm/v/cobolx-2)](https://www.npmjs.com/package/cobolx-2)
 
 COBOL-X is a modern COBOL-inspired programming platform for readable business logic, deterministic tooling, and backend-oriented workflows. This repository ships a TypeScript-based compiler toolchain, runtime, package manager layer, editor integration, and release validation flow.
 
@@ -17,6 +18,12 @@ COBOL-X is a modern COBOL-inspired programming platform for readable business lo
 - LSP and VS Code extension support for `.cbx`, `.cob`, and `.col`
 
 ## Installation
+
+```bash
+npm install cobolx-2
+```
+
+### Build from source
 
 ```powershell
 npm install
