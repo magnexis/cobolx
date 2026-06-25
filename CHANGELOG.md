@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.3 - 2026-06-13
+
+### Fixed
+- Fixed divide-by-zero producing `NaN` instead of a runtime error in DIVIDE and arithmetic operations
+- Division operations now correctly validate the divisor before evaluation
+
 ## 1.0.0 - 2026-04-11
 
 - Finalized the TypeScript COBOL-X workspace into a GitHub-ready release candidate
