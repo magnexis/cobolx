@@ -12,6 +12,7 @@ import type {
   ExportDeclarationNode,
   ExpressionNode,
   ExpressionStatementNode,
+  ForStatementNode,
   FunctionDeclarationNode,
   FunctionSignatureNode,
   GenericParam,
@@ -37,6 +38,7 @@ import type {
   SetStatementNode,
   SpawnStatementNode,
   StatementNode,
+  StringInterpolationNode,
   StringLiteralNode,
   TestDeclarationNode,
   TraitDeclarationNode,
@@ -50,6 +52,7 @@ import type {
 import type { SourceRange } from "../ast/types.js";
 import { CobolxError } from "../diagnostics.js";
 import type { Token, TokenType } from "../lexer/tokens.js";
+import { Lexer } from "../lexer/lexer.js";
 
 export class Parser {
   private index = 0;
@@ -325,6 +328,7 @@ export class Parser {
     if (this.match("UNSAFE")) return this.parseUnsafeBlock();
     if (this.match("ASSERT")) return this.parseAssertStatement();
     if (this.match("SPAWN")) return this.parseSpawnStatement();
+    if (this.match("FOR")) return this.parseForStatement();
     const expression = this.parseExpression();
     return { kind: "ExpressionStatement", expression, range: expression.range } satisfies ExpressionStatementNode;
   }
@@ -427,6 +431,25 @@ export class Parser {
     return { kind: "SpawnStatement", expression, range: this.mergeRanges(start, expression.range) };
   }
 
+  private parseForStatement(): ForStatementNode {
+    const start = this.previous().range;
+    const variable = this.consume("IDENTIFIER", "Expected variable name after FOR").lexeme;
+    this.consume("FROM", "Expected FROM in FOR statement");
+    const from = this.parseExpression();
+    this.consume("TO", "Expected TO in FOR statement");
+    const to = this.parseExpression();
+    let step: ExpressionNode;
+    if (this.match("STEP")) {
+      step = this.parseExpression();
+    } else {
+      step = { kind: "NumberLiteral", value: 1, range: to.range } satisfies NumberLiteralNode;
+    }
+    this.skipTrivia();
+    const body = this.parseStatementsUntil(["END-FOR"]);
+    const endToken = this.consume("END-FOR", "Expected END-FOR");
+    return { kind: "ForStatement", variable, from, to, step, body, range: this.mergeRanges(start, endToken.range) };
+  }
+
   private parsePattern(): PatternNode {
     if (this.match("IDENTIFIER")) {
       const token = this.previous();
@@ -524,6 +547,7 @@ export class Parser {
 
   private parsePrimary(): ExpressionNode {
     if (this.match("NUMBER", "STRING", "TRUE", "FALSE")) return this.literalFromToken(this.previous());
+    if (this.match("STRING_INTERPOLATION")) return this.parseStringInterpolation(this.previous());
     if (this.match("IDENTIFIER")) {
       const token = this.previous();
       if (this.check("LPAREN") && /^[A-Z]/.test(token.lexeme)) {
@@ -548,6 +572,39 @@ export class Parser {
       return expression;
     }
     throw new CobolxError({ message: `Unexpected token ${this.peek().type}`, range: this.peek().range, severity: "error" });
+  }
+
+  private parseStringInterpolation(token: Token): StringInterpolationNode {
+    const raw = token.lexeme;
+    const quasis: string[] = [];
+    const expressions: ExpressionNode[] = [];
+    let current = "";
+    let depth = 0;
+    let exprStart = -1;
+    for (let i = 0; i < raw.length; i++) {
+      if (raw[i] === "{" && depth === 0) {
+        quasis.push(current);
+        current = "";
+        depth = 1;
+        exprStart = i + 1;
+      } else if (raw[i] === "{" && depth > 0) {
+        depth++;
+      } else if (raw[i] === "}" && depth > 1) {
+        depth--;
+      } else if (raw[i] === "}" && depth === 1) {
+        const exprSource = raw.substring(exprStart, i);
+        const innerLexer = new Lexer(exprSource);
+        const innerTokens = innerLexer.tokenize();
+        const innerParser = new Parser(innerTokens);
+        expressions.push(innerParser.parseExpression());
+        depth = 0;
+        current = "";
+      } else {
+        current += raw[i];
+      }
+    }
+    quasis.push(current);
+    return { kind: "StringInterpolation", quasis, expressions, range: token.range };
   }
 
   private literalFromToken(token: Token): ExpressionNode {

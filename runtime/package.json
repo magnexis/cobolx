@@ -4,9 +4,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "powershell -NoProfile -Command \"if (Test-Path dist) { Remove-Item -Recurse -Force dist }; tsc -p tsconfig.json; if (Test-Path 'dist\\\\runtime\\\\src') { Copy-Item -Recurse -Force 'dist\\\\runtime\\\\src\\\\*' dist }\"",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json && node -e \"const s=require('path'),d='dist/runtime/src';require('fs').existsSync(d)&&require('fs').cpSync(d,'dist',{recursive:true})\"",
     "check": "tsc -p tsconfig.json --noEmit",
-    "clean": "if (Test-Path dist) { Remove-Item -Recurse -Force dist }"
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
     "@cobolx/compiler": "0.2.0"

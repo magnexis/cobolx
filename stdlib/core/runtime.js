@@ -20,7 +20,18 @@ export const math = {
   max: Math.max,
   min: Math.min,
   sqrt: Math.sqrt,
-  pow: Math.pow
+  pow: Math.pow,
+  modulo(a, b) {
+    return Math.floor(a % b);
+  },
+  randomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+  truncate(n) {
+    return Math.trunc(n);
+  }
 };
 
 export const strings = {
@@ -35,6 +46,31 @@ export const strings = {
   },
   concat(...values) {
     return values.map((value) => String(value)).join("");
+  },
+  capitalize(s) {
+    s = String(s);
+    return s[0].toUpperCase() + s.slice(1);
+  },
+  repeat(s, n) {
+    return String(s).repeat(n);
+  },
+  trim(s) {
+    return String(s).trim();
+  },
+  split(s, sep) {
+    return String(s).split(sep);
+  },
+  join(arr, sep) {
+    return arr.join(sep);
+  },
+  indexOf(s, sub) {
+    return String(s).indexOf(sub);
+  },
+  padLeft(s, len, ch) {
+    return String(s).padStart(len, ch);
+  },
+  padRight(s, len, ch) {
+    return String(s).padEnd(len, ch);
   }
 };
 

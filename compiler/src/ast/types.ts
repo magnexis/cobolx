@@ -144,6 +144,7 @@ export type StatementNode =
   | InputStatementNode
   | IfStatementNode
   | MatchStatementNode
+  | ForStatementNode
   | ReturnStatementNode
   | ExpressionStatementNode
   | UnsafeBlockNode
@@ -214,6 +215,15 @@ export interface BlockStatementNode extends BaseNode {
   body: StatementNode[];
 }
 
+export interface ForStatementNode extends BaseNode {
+  kind: "ForStatement";
+  variable: string;
+  from: ExpressionNode;
+  to: ExpressionNode;
+  step: ExpressionNode;
+  body: StatementNode[];
+}
+
 export interface ReturnStatementNode extends BaseNode {
   kind: "ReturnStatement";
   expression: ExpressionNode;
@@ -249,6 +259,7 @@ export interface LiteralPatternNode extends BaseNode {
 export type ExpressionNode =
   | NumberLiteralNode
   | StringLiteralNode
+  | StringInterpolationNode
   | BooleanLiteralNode
   | IdentifierNode
   | BinaryExpressionNode
@@ -268,6 +279,12 @@ export interface NumberLiteralNode extends BaseNode {
 export interface StringLiteralNode extends BaseNode {
   kind: "StringLiteral";
   value: string;
+}
+
+export interface StringInterpolationNode extends BaseNode {
+  kind: "StringInterpolation";
+  quasis: string[];
+  expressions: ExpressionNode[];
 }
 
 export interface BooleanLiteralNode extends BaseNode {

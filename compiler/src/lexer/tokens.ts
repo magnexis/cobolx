@@ -13,6 +13,10 @@ export type TokenType =
   | "THEN"
   | "ELSE"
   | "END-IF"
+  | "FOR"
+  | "END-FOR"
+  | "TO"
+  | "STEP"
   | "MATCH"
   | "END-MATCH"
   | "FUNCTION"
@@ -47,6 +51,7 @@ export type TokenType =
   | "IDENTIFIER"
   | "NUMBER"
   | "STRING"
+  | "STRING_INTERPOLATION"
   | "DOC_COMMENT"
   | "PLUS"
   | "MINUS"
@@ -103,6 +108,9 @@ export const KEYWORDS: Record<string, TokenType> = {
   "END-TRAIT": "END-TRAIT",
   IMPL: "IMPL",
   FOR: "FOR",
+  "END-FOR": "END-FOR",
+  TO: "TO",
+  STEP: "STEP",
   "END-IMPL": "END-IMPL",
   ENUM: "ENUM",
   MODULE: "MODULE",

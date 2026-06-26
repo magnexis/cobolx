@@ -125,6 +125,7 @@ export class Lexer {
     const start = cloneLocation(this.location);
     this.advance();
     let value = "";
+    let hasInterpolation = false;
     while (!this.isAtEnd() && this.peek() !== "\"") {
       if (this.peek() === "\n") {
         throw new CobolxError({
@@ -132,6 +133,9 @@ export class Lexer {
           range: { start, end: cloneLocation(this.location) },
           severity: "error"
         });
+      }
+      if (this.peek() === "{") {
+        hasInterpolation = true;
       }
       value += this.advance();
     }
@@ -144,7 +148,7 @@ export class Lexer {
     }
     this.advance();
     return {
-      type: "STRING",
+      type: hasInterpolation ? "STRING_INTERPOLATION" : "STRING",
       lexeme: value,
       range: { start, end: cloneLocation(this.location) }
     };

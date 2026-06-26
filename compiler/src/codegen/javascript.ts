@@ -63,6 +63,18 @@ function emitExpression(expression: ExpressionNode): string {
       return `${emitExpression(expression.object)}.${expression.property}`;
     case "EnumConstructorExpression":
       return `__variant(${JSON.stringify(expression.variantName)}, [${expression.fields.map(emitExpression).join(", ")}])`;
+    case "StringInterpolation": {
+      if (expression.expressions.length === 0) return JSON.stringify(expression.quasis.join(""));
+      let tpl = "`";
+      for (let i = 0; i < expression.quasis.length; i++) {
+        tpl += expression.quasis[i].replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$");
+        if (i < expression.expressions.length) {
+          tpl += "${" + emitExpression(expression.expressions[i]) + "}";
+        }
+      }
+      tpl += "`";
+      return tpl;
+    }
   }
 }
 
@@ -94,6 +106,17 @@ function emitStatement(statement: StatementNode, indent: string, scope: EmitScop
       const elseBranch = statement.elseBranch.map((child) => emitStatement(child, `${indent}  `, elseScope)).join("\n");
       const elseSection = elseBranch ? `\n${indent}else {\n${elseBranch}\n${indent}}` : "";
       return `${indent}if (${emitExpression(statement.condition)}) {\n${thenBranch}\n${indent}}${elseSection}`;
+    }
+    case "ForStatement": {
+      const forScope = new EmitScope(scope);
+      if (!forScope.has(statement.variable)) forScope.declare(statement.variable);
+      const body = statement.body.map((child) => emitStatement(child, `${indent}  `, forScope)).join("\n");
+      const stepExpr = emitExpression(statement.step);
+      const stepIsOne = statement.step.kind === "NumberLiteral" && statement.step.value === 1;
+      if (stepIsOne) {
+        return `${indent}for (let ${statement.variable} = ${emitExpression(statement.from)}; ${statement.variable} <= ${emitExpression(statement.to)}; ${statement.variable}++) {\n${body}\n${indent}}`;
+      }
+      return `${indent}for (let ${statement.variable} = ${emitExpression(statement.from)}; ${statement.variable} <= ${emitExpression(statement.to)}; ${statement.variable} += ${stepExpr}) {\n${body}\n${indent}}`;
     }
     case "MatchStatement":
       return emitMatchStatement(statement.arms, emitExpression(statement.expression), indent, scope);

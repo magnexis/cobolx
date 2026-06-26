@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.3.0 - 2026-06-14
+
+### Added
+- FOR loop construct: `FOR var FROM start TO end [STEP step] ... END-FOR` compiles to JavaScript `for` loop
+- String interpolation: strings containing `{expr}` now compile to JavaScript template literals
+- `math.modulo(a, b)` — proper integer modulo via `Math.floor(a % b)`
+- `math.randomInt(min, max)` — random integer in range `[min, max]`
+- `math.truncate(n)` — `Math.trunc(n)`
+- `strings.capitalize(s)` — capitalize first character
+- `strings.repeat(s, n)` — repeat string n times
+- `strings.trim(s)` — trim whitespace
+- `strings.split(s, sep)` — split string by separator
+- `strings.join(arr, sep)` — join array with separator
+- `strings.indexOf(s, sub)` — find substring index
+- `strings.padLeft(s, len, ch)` — left-pad string
+- `strings.padRight(s, len, ch)` — right-pad string
+
+### Changed
+- Replaced all PowerShell-only build/clean scripts with cross-platform `node -e` equivalents
+
 ## 1.2.3 - 2026-06-13
 
 ### Fixed
