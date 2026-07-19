@@ -37,8 +37,13 @@ function inferExpression(expression: ExpressionNode, scope: Scope, diagnostics: 
     case "ArrayLiteral":
       for (const item of expression.items) inferExpression(item, scope, diagnostics);
       return "array";
+    case "StringInterpolation":
+      for (const expr of expression.expressions) inferExpression(expr, scope, diagnostics);
+      return "string";
     case "BinaryExpression":
       return inferBinaryExpression(expression, scope, diagnostics);
+    default:
+      return "unknown";
   }
 }
 
@@ -93,6 +98,31 @@ export function inferProgramTypes(program: ProgramNode): { symbolTypes: Record<s
         case "BlockStatement":
           visitStatements(statement.body, { values: new Map(localScope.values), parent: localScope });
           break;
+        case "ForStatement": {
+          inferExpression(statement.from, localScope, diagnostics);
+          inferExpression(statement.to, localScope, diagnostics);
+          inferExpression(statement.step, localScope, diagnostics);
+          const forScope = { values: new Map(localScope.values), parent: localScope };
+          forScope.values.set(statement.variable, "number");
+          visitStatements(statement.body, forScope);
+          break;
+        }
+        case "WhileStatement":
+          inferExpression(statement.condition, localScope, diagnostics);
+          visitStatements(statement.body, { values: new Map(localScope.values), parent: localScope.parent });
+          break;
+        case "BreakStatement":
+        case "ContinueStatement":
+          break;
+        case "TryStatement":
+          visitStatements(statement.body, { values: new Map(localScope.values), parent: localScope.parent });
+          if (statement.catchBody) visitStatements(statement.catchBody, { values: new Map(localScope.values), parent: localScope.parent });
+          break;
+        case "SwitchStatement":
+          inferExpression(statement.expression, localScope, diagnostics);
+          for (const c of statement.cases) visitStatements(c.body, { values: new Map(localScope.values), parent: localScope.parent });
+          if (statement.defaultBody) visitStatements(statement.defaultBody, { values: new Map(localScope.values), parent: localScope.parent });
+          break;
       }
     }
   };
@@ -101,6 +131,13 @@ export function inferProgramTypes(program: ProgramNode): { symbolTypes: Record<s
     const fnScope: Scope = { values: new Map(), parent: scope };
     for (const param of fn.signature.params) fnScope.values.set(param.name, param.typeName === "STRING" ? "string" : "unknown");
     visitStatements(fn.body, fnScope);
+  }
+  for (const mod of program.modules) {
+    for (const fn of mod.functions) {
+      const fnScope: Scope = { values: new Map(), parent: scope };
+      for (const param of fn.signature.params) fnScope.values.set(param.name, param.typeName === "STRING" ? "string" : "unknown");
+      visitStatements(fn.body, fnScope);
+    }
   }
 
   visitStatements(program.body, scope);

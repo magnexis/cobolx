@@ -51,6 +51,8 @@ function foldExpression(expression: ExpressionNode): ExpressionNode {
       return { ...expression, fields: expression.fields.map(foldExpression) };
     case "ArrayLiteral":
       return { ...expression, items: expression.items.map(foldExpression) };
+    case "StringInterpolation":
+      return { ...expression, expressions: expression.expressions.map(foldExpression) };
     default:
       return expression;
   }
@@ -86,6 +88,17 @@ function foldStatement(statement: StatementNode): StatementNode {
     case "UnsafeBlock":
     case "BlockStatement":
       return { ...statement, body: statement.body.map(foldStatement) };
+    case "ForStatement":
+      return { ...statement, from: foldExpression(statement.from), to: foldExpression(statement.to), step: foldExpression(statement.step), body: statement.body.map(foldStatement) };
+    case "WhileStatement":
+      return { ...statement, condition: foldExpression(statement.condition), body: statement.body.map(foldStatement) };
+    case "BreakStatement":
+    case "ContinueStatement":
+      return statement;
+    case "TryStatement":
+      return { ...statement, body: statement.body.map(foldStatement), catchBody: statement.catchBody ? statement.catchBody.map(foldStatement) : undefined };
+    case "SwitchStatement":
+      return { ...statement, expression: foldExpression(statement.expression), cases: statement.cases.map((c) => ({ ...c, body: c.body.map(foldStatement) })), defaultBody: statement.defaultBody ? statement.defaultBody.map(foldStatement) : undefined };
     default:
       return statement;
   }

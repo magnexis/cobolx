@@ -24,6 +24,8 @@ function rewriteExpression(expression: ExpressionNode): ExpressionNode {
       return { ...expression, fields: expression.fields.map(rewriteExpression) };
     case "ArrayLiteral":
       return { ...expression, items: expression.items.map(rewriteExpression) };
+    case "StringInterpolation":
+      return { ...expression, expressions: expression.expressions.map(rewriteExpression) };
     default:
       return expression;
   }
@@ -49,6 +51,21 @@ function rewriteStatement(statement: StatementNode): StatementNode {
     case "UnsafeBlock":
     case "BlockStatement":
       return { ...statement, body: statement.body.map(rewriteStatement) };
+    case "ForStatement":
+      return { ...statement, from: rewriteExpression(statement.from), to: rewriteExpression(statement.to), step: rewriteExpression(statement.step), body: statement.body.map(rewriteStatement) };
+    case "WhileStatement":
+      return { ...statement, condition: rewriteExpression(statement.condition), body: statement.body.map(rewriteStatement) };
+    case "BreakStatement":
+    case "ContinueStatement":
+      return statement;
+    case "TryStatement":
+      return { ...statement, body: statement.body.map(rewriteStatement), catchBody: statement.catchBody ? statement.catchBody.map(rewriteStatement) : undefined };
+    case "SwitchStatement": {
+      const cases = statement.cases.map((c) => ({ ...c, body: c.body.map(rewriteStatement) }));
+      return { ...statement, expression: rewriteExpression(statement.expression), cases, defaultBody: statement.defaultBody ? statement.defaultBody.map(rewriteStatement) : undefined };
+    }
+    default:
+      return statement;
   }
 }
 
@@ -62,8 +79,18 @@ function macroToCall(expression: MacroInvocationNode): CallExpressionNode {
 }
 
 export function expandMacros(program: ProgramNode): ProgramNode {
+  const expandModule = (mod: typeof program.modules[0]) => ({
+    ...mod,
+    macros: mod.macros.map((macro) => ({
+      ...macro,
+      name: `__macro_${macro.name}`,
+      body: macro.body.map(rewriteStatement)
+    })),
+    functions: mod.functions.map((fn) => ({ ...fn, body: fn.body.map(rewriteStatement) }))
+  });
   return {
     ...program,
+    modules: program.modules.map(expandModule),
     functions: program.functions.map((fn) => ({ ...fn, body: fn.body.map(rewriteStatement) })),
     macros: program.macros.map((macro) => ({
       ...macro,

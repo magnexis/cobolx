@@ -32,6 +32,9 @@ function collectMutatedParams(params: string[], statements: StatementNode[]): st
       case "BlockStatement":
         for (const name of collectMutatedParams(params, statement.body)) mutated.add(name);
         break;
+      case "ForStatement":
+        for (const name of collectMutatedParams(params, statement.body)) mutated.add(name);
+        break;
     }
   }
   return [...mutated];

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0 - 2026-07-19
+
+### Added
+- Complete `ForStatement` support across compiler passes: macro expansion, type inference, borrow checking, HIR lowering, optimization, semantic analysis, and formatting
+- Major version release
+
+### Fixed
+- TypeScript `TS2366` errors in `rewriteStatement`, `inferExpression`, `formatExpression`, and `formatStatement`
+
 ## 1.3.0 - 2026-06-14
 
 ### Added

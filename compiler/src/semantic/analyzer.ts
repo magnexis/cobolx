@@ -77,16 +77,34 @@ export class SemanticAnalyzer {
       }
     }
 
-    for (const fn of program.functions) {
-      const scope = new Scope();
-      for (const constant of program.consts) scope.declare(constant.name);
-      for (const param of fn.signature.params) scope.declare(param.name);
-      this.analyzeStatements(fn.body, scope, functions, macros, diagnostics, true);
-    }
-
     const rootScope = new Scope();
     for (const constant of program.consts) rootScope.declare(constant.name);
     for (const importDecl of program.imports) rootScope.declare(importDecl.alias ?? importDecl.importedName);
+
+  for (const mod of program.modules) {
+    for (const constant of mod.consts) rootScope.declare(constant.name);
+    for (const macro of mod.macros) {
+      if (macros.has(macro.name)) diagnostics.push({ message: `Macro '${macro.name}' is already declared`, range: macro.range, severity: "error" });
+      macros.add(macro.name);
+      if (!functions.has(macro.name)) {
+        functions.set(macro.name, { params: macro.params, declaration: { kind: "FunctionDeclaration", signature: { kind: "FunctionSignature", name: macro.name, genericParams: [], params: macro.params.map((param) => ({ name: param })), range: macro.range }, body: macro.body, range: macro.range } });
+      }
+    }
+    for (const fn of mod.functions) {
+      const name = fn.signature.name;
+      if (functions.has(name)) diagnostics.push({ message: `Function '${name}' is already declared`, range: fn.range, severity: "error" });
+      else functions.set(name, { params: fn.signature.params.map((param) => param.name), declaration: fn });
+      this.validateLifetimeSignature(fn.signature, diagnostics);
+    }
+  }
+
+  for (const fn of program.functions) {
+    const scope = new Scope();
+    for (const constant of program.consts) scope.declare(constant.name);
+    for (const param of fn.signature.params) scope.declare(param.name);
+    this.analyzeStatements(fn.body, scope, functions, macros, diagnostics, true);
+  }
+
     this.analyzeStatements(program.body, rootScope, functions, macros, diagnostics, false);
     return diagnostics;
   }
@@ -147,6 +165,31 @@ export class SemanticAnalyzer {
         case "UnsafeBlock":
         case "BlockStatement":
           this.analyzeStatements(statement.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          break;
+        case "ForStatement": {
+          this.analyzeExpression(statement.from, scope, functions, macros, diagnostics);
+          this.analyzeExpression(statement.to, scope, functions, macros, diagnostics);
+          this.analyzeExpression(statement.step, scope, functions, macros, diagnostics);
+          const forScope = new Scope(scope);
+          forScope.declare(statement.variable);
+          this.analyzeStatements(statement.body, forScope, functions, macros, diagnostics, insideFunction);
+          break;
+        }
+        case "WhileStatement":
+          this.analyzeExpression(statement.condition, scope, functions, macros, diagnostics);
+          this.analyzeStatements(statement.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          break;
+        case "BreakStatement":
+        case "ContinueStatement":
+          break;
+        case "TryStatement":
+          this.analyzeStatements(statement.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          if (statement.catchBody) this.analyzeStatements(statement.catchBody, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          break;
+        case "SwitchStatement":
+          this.analyzeExpression(statement.expression, scope, functions, macros, diagnostics);
+          for (const c of statement.cases) this.analyzeStatements(c.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          if (statement.defaultBody) this.analyzeStatements(statement.defaultBody, new Scope(scope), functions, macros, diagnostics, insideFunction);
           break;
       }
     }
@@ -212,6 +255,9 @@ export class SemanticAnalyzer {
         break;
       case "ArrayLiteral":
         for (const item of expression.items) this.analyzeExpression(item, scope, functions, macros, diagnostics);
+        break;
+      case "StringInterpolation":
+        for (const expr of expression.expressions) this.analyzeExpression(expr, scope, functions, macros, diagnostics);
         break;
       case "NumberLiteral":
       case "StringLiteral":

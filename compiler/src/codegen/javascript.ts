@@ -132,6 +132,33 @@ function emitStatement(statement: StatementNode, indent: string, scope: EmitScop
       return `${indent}__debug.record(${JSON.stringify("return")});\n${indent}return ${emitExpression(statement.expression)};`;
     case "ExpressionStatement":
       return `${indent}${emitExpression(statement.expression)};\n${indent}__debug.record(${JSON.stringify("expression")});`;
+    case "WhileStatement": {
+      const whileScope = new EmitScope(scope);
+      const body = statement.body.map((child) => emitStatement(child, `${indent}  `, whileScope)).join("\n");
+      return `${indent}while (${emitExpression(statement.condition)}) {\n${body}\n${indent}}`;
+    }
+    case "BreakStatement":
+      return `${indent}break;`;
+    case "ContinueStatement":
+      return `${indent}continue;`;
+    case "TryStatement": {
+      const tryScope = new EmitScope(scope);
+      const tryBody = statement.body.map((child) => emitStatement(child, `${indent}  `, tryScope)).join("\n");
+      const catchBody = statement.catchBody ? statement.catchBody.map((child) => emitStatement(child, `${indent}  `, new EmitScope(scope))).join("\n") : "";
+      const catchVar = statement.catchBinding ? `const ${statement.catchBinding} = __catchValue;` : "";
+      return `${indent}try {\n${tryBody}\n${indent}} catch (__catchValue) {\n${indent}  ${catchVar}\n${catchBody}\n${indent}}`;
+    }
+    case "SwitchStatement": {
+      const switchScope = new EmitScope(scope);
+      const cases = statement.cases.map((c) => {
+        const caseBody = c.body.map((child) => emitStatement(child, `${indent}    `, new EmitScope(switchScope))).join("\n");
+        return `${indent}  case ${emitExpression(c.value)}: {\n${caseBody}\n${indent}  }`;
+      }).join("\n");
+      const defaultPart = statement.defaultBody ? `\n${indent}  default: {\n${statement.defaultBody.map((child) => emitStatement(child, `${indent}    `, new EmitScope(switchScope))).join("\n")}\n${indent}  }` : "";
+      return `${indent}switch (${emitExpression(statement.expression)}) {\n${cases}${defaultPart}\n${indent}}`;
+    }
+    default:
+      return `${indent}// unknown statement`;
   }
 }
 
