@@ -51,6 +51,8 @@ function foldExpression(expression: ExpressionNode): ExpressionNode {
       return { ...expression, fields: expression.fields.map(foldExpression) };
     case "ArrayLiteral":
       return { ...expression, items: expression.items.map(foldExpression) };
+    case "StringInterpolation":
+      return { ...expression, expressions: expression.expressions.map(foldExpression) };
     default:
       return expression;
   }

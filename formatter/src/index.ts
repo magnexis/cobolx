@@ -27,6 +27,10 @@ function formatExpression(expression: ExpressionNode): string {
       return `${expression.variantName}(${expression.fields.map(formatExpression).join(", ")})`;
     case "ArrayLiteral":
       return `[${expression.items.map(formatExpression).join(", ")}]`;
+    case "StringInterpolation": {
+      const parts = expression.quasis.map((q, i) => (i < expression.expressions.length ? q + `{${formatExpression(expression.expressions[i])}}` : q));
+      return `"` + parts.join("") + `"`;
+    }
     default:
       return "";
   }
@@ -95,6 +99,71 @@ function formatPattern(pattern: PatternNode): string {
 
 function formatProgram(program: ProgramNode): string {
   const lines = [`PROGRAM ${program.name}`, ""];
+  for (const trait of program.traits) {
+    const composed = trait.composedTraits.length ? `: ${trait.composedTraits.join(", ")}` : "";
+    lines.push(`TRAIT ${trait.name}${composed}`);
+    for (const method of trait.methods) {
+      lines.push(`  ${method.signature.isAsync ? "ASYNC " : ""}FUNCTION ${method.signature.name}(${method.signature.params.map((p) => p.name).join(", ")}) BEGIN`);
+      lines.push(...method.body.map((statement) => formatStatement(statement, "    ")));
+      lines.push("  END-FUNCTION");
+    }
+    lines.push("END-TRAIT", "");
+  }
+  for (const impl of program.impls) {
+    const traitRef = impl.traitName ? ` ${impl.traitName} FOR ` : "";
+    lines.push(`IMPL${traitRef}${impl.targetType}`);
+    for (const method of impl.methods) {
+      lines.push(`  ${method.signature.isAsync ? "ASYNC " : ""}FUNCTION ${method.signature.name}(${method.signature.params.map((p) => p.name).join(", ")}) BEGIN`);
+      lines.push(...method.body.map((statement) => formatStatement(statement, "    ")));
+      lines.push("  END-FUNCTION");
+    }
+    lines.push("END-IMPL", "");
+  }
+  for (const macro of program.macros) {
+    lines.push(`MACRO ${macro.name}(${macro.params.join(", ")}) BEGIN`);
+    lines.push(...macro.body.map((statement) => formatStatement(statement, "  ")));
+    lines.push("END-MACRO", "");
+  }
+  for (const mod of program.modules) {
+    const modLines = [`MODULE ${mod.name}`];
+    for (const constant of mod.consts) modLines.push(`CONST ${constant.name} = ${formatExpression(constant.expression)}`);
+    for (const en of mod.enums) {
+      const variants = en.variants.map((v) => v.name + (v.fields.length ? `(${v.fields.map((f) => f.name + (f.typeName ? `: ${f.typeName}` : "")).join(", ")})` : "")).join(", ");
+      modLines.push(`ENUM ${en.name}${en.variants.length ? " (" + variants + ")" : ""}`);
+    }
+    for (const trait of mod.traits) {
+      const composed = trait.composedTraits.length ? `: ${trait.composedTraits.join(", ")}` : "";
+      modLines.push(`TRAIT ${trait.name}${composed}`);
+      for (const method of trait.methods) {
+        modLines.push(`  ${method.signature.isAsync ? "ASYNC " : ""}FUNCTION ${method.signature.name}(${method.signature.params.map((p) => p.name).join(", ")}) BEGIN`);
+        modLines.push(...method.body.map((s) => formatStatement(s, "    ")));
+        modLines.push("  END-FUNCTION");
+      }
+      modLines.push("END-TRAIT");
+    }
+    for (const impl of mod.impls) {
+      const traitRef = impl.traitName ? ` ${impl.traitName} FOR ` : "";
+      modLines.push(`IMPL${traitRef}${impl.targetType}`);
+      for (const method of impl.methods) {
+        modLines.push(`  ${method.signature.isAsync ? "ASYNC " : ""}FUNCTION ${method.signature.name}(${method.signature.params.map((p) => p.name).join(", ")}) BEGIN`);
+        modLines.push(...method.body.map((s) => formatStatement(s, "    ")));
+        modLines.push("  END-FUNCTION");
+      }
+      modLines.push("END-IMPL");
+    }
+    for (const macro of mod.macros) {
+      modLines.push(`MACRO ${macro.name}(${macro.params.join(", ")}) BEGIN`);
+      modLines.push(...macro.body.map((s) => formatStatement(s, "  ")));
+      modLines.push("END-MACRO");
+    }
+    for (const fn of mod.functions) {
+      modLines.push(`${fn.signature.isAsync ? "ASYNC " : ""}FUNCTION ${fn.signature.name}(${fn.signature.params.map((param) => param.name).join(", ")}) BEGIN`);
+      modLines.push(...fn.body.map((statement) => formatStatement(statement, "  ")));
+      modLines.push("END-FUNCTION");
+    }
+    modLines.push("END-MODULE");
+    lines.push(modLines.join("\n"), "");
+  }
   for (const constant of program.consts) lines.push(`CONST ${constant.name} = ${formatExpression(constant.expression)}`);
   for (const fn of program.functions) {
     lines.push(`${fn.signature.isAsync ? "ASYNC " : ""}FUNCTION ${fn.signature.name}(${fn.signature.params.map((param) => param.name).join(", ")}) BEGIN`);

@@ -37,6 +37,9 @@ function inferExpression(expression: ExpressionNode, scope: Scope, diagnostics: 
     case "ArrayLiteral":
       for (const item of expression.items) inferExpression(item, scope, diagnostics);
       return "array";
+    case "StringInterpolation":
+      for (const expr of expression.expressions) inferExpression(expr, scope, diagnostics);
+      return "string";
     case "BinaryExpression":
       return inferBinaryExpression(expression, scope, diagnostics);
     default:
@@ -112,6 +115,13 @@ export function inferProgramTypes(program: ProgramNode): { symbolTypes: Record<s
     const fnScope: Scope = { values: new Map(), parent: scope };
     for (const param of fn.signature.params) fnScope.values.set(param.name, param.typeName === "STRING" ? "string" : "unknown");
     visitStatements(fn.body, fnScope);
+  }
+  for (const mod of program.modules) {
+    for (const fn of mod.functions) {
+      const fnScope: Scope = { values: new Map(), parent: scope };
+      for (const param of fn.signature.params) fnScope.values.set(param.name, param.typeName === "STRING" ? "string" : "unknown");
+      visitStatements(fn.body, fnScope);
+    }
   }
 
   visitStatements(program.body, scope);

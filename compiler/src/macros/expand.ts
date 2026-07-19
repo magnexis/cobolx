@@ -24,6 +24,8 @@ function rewriteExpression(expression: ExpressionNode): ExpressionNode {
       return { ...expression, fields: expression.fields.map(rewriteExpression) };
     case "ArrayLiteral":
       return { ...expression, items: expression.items.map(rewriteExpression) };
+    case "StringInterpolation":
+      return { ...expression, expressions: expression.expressions.map(rewriteExpression) };
     default:
       return expression;
   }
@@ -66,8 +68,18 @@ function macroToCall(expression: MacroInvocationNode): CallExpressionNode {
 }
 
 export function expandMacros(program: ProgramNode): ProgramNode {
+  const expandModule = (mod: typeof program.modules[0]) => ({
+    ...mod,
+    macros: mod.macros.map((macro) => ({
+      ...macro,
+      name: `__macro_${macro.name}`,
+      body: macro.body.map(rewriteStatement)
+    })),
+    functions: mod.functions.map((fn) => ({ ...fn, body: fn.body.map(rewriteStatement) }))
+  });
   return {
     ...program,
+    modules: program.modules.map(expandModule),
     functions: program.functions.map((fn) => ({ ...fn, body: fn.body.map(rewriteStatement) })),
     macros: program.macros.map((macro) => ({
       ...macro,

@@ -31,6 +31,9 @@ function collectCalls(expression: ExpressionNode, calls: CallExpressionNode[]): 
     case "ArrayLiteral":
       for (const item of expression.items) collectCalls(item, calls);
       break;
+    case "StringInterpolation":
+      for (const expr of expression.expressions) collectCalls(expr, calls);
+      break;
     default:
       break;
   }
