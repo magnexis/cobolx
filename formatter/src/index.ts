@@ -77,6 +77,32 @@ function formatStatement(statement: StatementNode, indent = ""): string {
       const bodyLines = statement.body.map((child) => formatStatement(child, `${indent}  `));
       return [`${indent}FOR ${statement.variable} FROM ${formatExpression(statement.from)} TO ${formatExpression(statement.to)}${stepStr}`, ...bodyLines, `${indent}END-FOR`].join("\n");
     }
+    case "BreakStatement":
+      return `${indent}BREAK`;
+    case "ContinueStatement":
+      return `${indent}CONTINUE`;
+    case "WhileStatement": {
+      const bodyLines = statement.body.map((child) => formatStatement(child, `${indent}  `));
+      return [`${indent}WHILE ${formatExpression(statement.condition)} BEGIN`, ...bodyLines, `${indent}END-WHILE`].join("\n");
+    }
+    case "TryStatement": {
+      const tryBody = statement.body.map((child) => formatStatement(child, `${indent}  `)).join("\n");
+      const catchSection = statement.catchBody ? `
+${indent}CATCH ${statement.catchBinding ?? "_"} BEGIN
+${statement.catchBody.map((child) => formatStatement(child, `${indent}  `)).join("\n")}
+${indent}END-CATCH` : "";
+      return [`${indent}TRY BEGIN`, tryBody, `${indent}END-TRY${catchSection}`].join("\n");
+    }
+    case "SwitchStatement": {
+      const caseLines = statement.cases.map((c) => `${indent}  CASE ${formatExpression(c.value)} BEGIN
+${c.body.map((child) => formatStatement(child, `${indent}    `)).join("\n")}
+${indent}  END-CASE`).join("\n");
+      const defaultPart = statement.defaultBody ? `
+${indent}  DEFAULT BEGIN
+${statement.defaultBody.map((child) => formatStatement(child, `${indent}    `)).join("\n")}
+${indent}  END-DEFAULT` : "";
+      return [`${indent}SWITCH ${formatExpression(statement.expression)} BEGIN`, caseLines, defaultPart, `${indent}END-SWITCH`].join("\n");
+    }
     default:
       return "";
   }

@@ -45,6 +45,20 @@ export type TokenType =
   | "UNSAFE"
   | "END-UNSAFE"
   | "SPAWN"
+  | "WHILE"
+  | "END-WHILE"
+  | "BREAK"
+  | "CONTINUE"
+  | "TRY"
+  | "END-TRY"
+  | "CATCH"
+  | "END-CATCH"
+  | "SWITCH"
+  | "END-SWITCH"
+  | "CASE"
+  | "END-CASE"
+  | "DEFAULT"
+  | "END-DEFAULT"
   | "PUBLIC"
   | "TRUE"
   | "FALSE"
@@ -129,6 +143,20 @@ export const KEYWORDS: Record<string, TokenType> = {
   "END-UNSAFE": "END-UNSAFE",
   SPAWN: "SPAWN",
   PUBLIC: "PUBLIC",
+  WHILE: "WHILE",
+  "END-WHILE": "END-WHILE",
+  BREAK: "BREAK",
+  CONTINUE: "CONTINUE",
+  TRY: "TRY",
+  "END-TRY": "END-TRY",
+  CATCH: "CATCH",
+  "END-CATCH": "END-CATCH",
+  SWITCH: "SWITCH",
+  "END-SWITCH": "END-SWITCH",
+  CASE: "CASE",
+  "END-CASE": "END-CASE",
+  DEFAULT: "DEFAULT",
+  "END-DEFAULT": "END-DEFAULT",
   TRUE: "TRUE",
   FALSE: "FALSE"
 };

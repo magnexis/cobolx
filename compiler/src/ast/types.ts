@@ -145,6 +145,11 @@ export type StatementNode =
   | IfStatementNode
   | MatchStatementNode
   | ForStatementNode
+  | WhileStatementNode
+  | BreakStatementNode
+  | ContinueStatementNode
+  | TryStatementNode
+  | SwitchStatementNode
   | ReturnStatementNode
   | ExpressionStatementNode
   | UnsafeBlockNode
@@ -221,6 +226,40 @@ export interface ForStatementNode extends BaseNode {
   from: ExpressionNode;
   to: ExpressionNode;
   step: ExpressionNode;
+  body: StatementNode[];
+}
+
+export interface WhileStatementNode extends BaseNode {
+  kind: "WhileStatement";
+  condition: ExpressionNode;
+  body: StatementNode[];
+}
+
+export interface BreakStatementNode extends BaseNode {
+  kind: "BreakStatement";
+}
+
+export interface ContinueStatementNode extends BaseNode {
+  kind: "ContinueStatement";
+}
+
+export interface TryStatementNode extends BaseNode {
+  kind: "TryStatement";
+  body: StatementNode[];
+  catchBinding?: string;
+  catchBody?: StatementNode[];
+}
+
+export interface SwitchStatementNode extends BaseNode {
+  kind: "SwitchStatement";
+  expression: ExpressionNode;
+  cases: SwitchCaseNode[];
+  defaultBody?: StatementNode[];
+}
+
+export interface SwitchCaseNode extends BaseNode {
+  kind: "SwitchCase";
+  value: ExpressionNode;
   body: StatementNode[];
 }
 

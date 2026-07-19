@@ -107,6 +107,22 @@ export function inferProgramTypes(program: ProgramNode): { symbolTypes: Record<s
           visitStatements(statement.body, forScope);
           break;
         }
+        case "WhileStatement":
+          inferExpression(statement.condition, localScope, diagnostics);
+          visitStatements(statement.body, { values: new Map(localScope.values), parent: localScope.parent });
+          break;
+        case "BreakStatement":
+        case "ContinueStatement":
+          break;
+        case "TryStatement":
+          visitStatements(statement.body, { values: new Map(localScope.values), parent: localScope.parent });
+          if (statement.catchBody) visitStatements(statement.catchBody, { values: new Map(localScope.values), parent: localScope.parent });
+          break;
+        case "SwitchStatement":
+          inferExpression(statement.expression, localScope, diagnostics);
+          for (const c of statement.cases) visitStatements(c.body, { values: new Map(localScope.values), parent: localScope.parent });
+          if (statement.defaultBody) visitStatements(statement.defaultBody, { values: new Map(localScope.values), parent: localScope.parent });
+          break;
       }
     }
   };

@@ -43,6 +43,12 @@ import type {
   TestDeclarationNode,
   TraitDeclarationNode,
   TryExpressionNode,
+  WhileStatementNode,
+  BreakStatementNode,
+  ContinueStatementNode,
+  TryStatementNode,
+  SwitchStatementNode,
+  SwitchCaseNode,
   TypedName,
   UnaryExpressionNode,
   UnsafeBlockNode,
@@ -329,6 +335,11 @@ export class Parser {
     if (this.match("ASSERT")) return this.parseAssertStatement();
     if (this.match("SPAWN")) return this.parseSpawnStatement();
     if (this.match("FOR")) return this.parseForStatement();
+    if (this.match("WHILE")) return this.parseWhileStatement();
+    if (this.match("BREAK")) return this.parseBreakStatement();
+    if (this.match("CONTINUE")) return this.parseContinueStatement();
+    if (this.match("TRY")) return this.parseTryStatement();
+    if (this.match("SWITCH")) return this.parseSwitchStatement();
     const expression = this.parseExpression();
     return { kind: "ExpressionStatement", expression, range: expression.range } satisfies ExpressionStatementNode;
   }
@@ -448,6 +459,85 @@ export class Parser {
     const body = this.parseStatementsUntil(["END-FOR"]);
     const endToken = this.consume("END-FOR", "Expected END-FOR");
     return { kind: "ForStatement", variable, from, to, step, body, range: this.mergeRanges(start, endToken.range) };
+  }
+
+  private parseWhileStatement(): WhileStatementNode {
+    const start = this.previous().range;
+    const condition = this.parseExpression();
+    this.skipTrivia();
+    this.consume("BEGIN", "Expected BEGIN after WHILE condition");
+    this.skipTrivia();
+    const body = this.parseStatementsUntil(["END-WHILE"]);
+    const endToken = this.consume("END-WHILE", "Expected END-WHILE");
+    return { kind: "WhileStatement", condition, body, range: this.mergeRanges(start, endToken.range) };
+  }
+
+  private parseBreakStatement(): BreakStatementNode {
+    const start = this.previous().range;
+    return { kind: "BreakStatement", range: start };
+  }
+
+  private parseContinueStatement(): ContinueStatementNode {
+    const start = this.previous().range;
+    return { kind: "ContinueStatement", range: start };
+  }
+
+  private parseTryStatement(): TryStatementNode {
+    const start = this.previous().range;
+    this.skipTrivia();
+    this.consume("BEGIN", "Expected BEGIN after TRY");
+    this.skipTrivia();
+    const body = this.parseStatementsUntil(["CATCH", "END-TRY"]);
+    let catchBinding: string | undefined;
+    let catchBody: StatementNode[] | undefined;
+    if (this.check("CATCH")) {
+      this.advance();
+      catchBinding = this.consume("IDENTIFIER", "Expected catch variable name").lexeme;
+      this.skipTrivia();
+      this.consume("BEGIN", "Expected BEGIN after CATCH");
+      this.skipTrivia();
+      catchBody = this.parseStatementsUntil(["END-CATCH", "END-TRY"]);
+      if (this.check("END-CATCH")) {
+        this.consume("END-CATCH", "Expected END-CATCH");
+      }
+    }
+    const endToken = this.consume("END-TRY", "Expected END-TRY");
+    return { kind: "TryStatement", body, catchBinding, catchBody, range: this.mergeRanges(start, endToken.range) };
+  }
+
+  private parseSwitchStatement(): SwitchStatementNode {
+    const start = this.previous().range;
+    const expression = this.parseExpression();
+    this.skipTrivia();
+    this.consume("BEGIN", "Expected BEGIN after SWITCH expression");
+    this.skipTrivia();
+    const cases: SwitchCaseNode[] = [];
+    let defaultBody: StatementNode[] | undefined;
+    while (!this.check("END-SWITCH") && !this.check("EOF")) {
+      if (this.match("DEFAULT")) {
+        this.skipTrivia();
+        const body: StatementNode[] = [];
+        while (!this.check("END-SWITCH") && !this.check("EOF") && !this.check("CASE") && !this.check("DEFAULT")) {
+          body.push(this.parseStatement());
+          this.skipTrivia();
+        }
+        defaultBody = body;
+        continue;
+      }
+      if (this.match("CASE")) {
+        const value = this.parseExpression();
+        const body: StatementNode[] = [];
+        while (!this.check("END-SWITCH") && !this.check("EOF") && !this.check("CASE") && !this.check("DEFAULT")) {
+          body.push(this.parseStatement());
+          this.skipTrivia();
+        }
+        cases.push({ kind: "SwitchCase", value, body, range: this.mergeRanges(value.range, body.at(-1)?.range ?? value.range) });
+      } else {
+        this.skipTrivia();
+      }
+    }
+    const endToken = this.consume("END-SWITCH", "Expected END-SWITCH");
+    return { kind: "SwitchStatement", expression, cases, defaultBody, range: this.mergeRanges(start, endToken.range) };
   }
 
   private parsePattern(): PatternNode {

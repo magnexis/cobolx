@@ -53,6 +53,17 @@ function rewriteStatement(statement: StatementNode): StatementNode {
       return { ...statement, body: statement.body.map(rewriteStatement) };
     case "ForStatement":
       return { ...statement, from: rewriteExpression(statement.from), to: rewriteExpression(statement.to), step: rewriteExpression(statement.step), body: statement.body.map(rewriteStatement) };
+    case "WhileStatement":
+      return { ...statement, condition: rewriteExpression(statement.condition), body: statement.body.map(rewriteStatement) };
+    case "BreakStatement":
+    case "ContinueStatement":
+      return statement;
+    case "TryStatement":
+      return { ...statement, body: statement.body.map(rewriteStatement), catchBody: statement.catchBody ? statement.catchBody.map(rewriteStatement) : undefined };
+    case "SwitchStatement": {
+      const cases = statement.cases.map((c) => ({ ...c, body: c.body.map(rewriteStatement) }));
+      return { ...statement, expression: rewriteExpression(statement.expression), cases, defaultBody: statement.defaultBody ? statement.defaultBody.map(rewriteStatement) : undefined };
+    }
     default:
       return statement;
   }

@@ -74,6 +74,22 @@ function collectStatementCalls(statement: StatementNode, calls: CallExpressionNo
       collectCalls(statement.step, calls);
       for (const child of statement.body) collectStatementCalls(child, calls);
       break;
+    case "WhileStatement":
+      collectCalls(statement.condition, calls);
+      for (const child of statement.body) collectStatementCalls(child, calls);
+      break;
+    case "BreakStatement":
+    case "ContinueStatement":
+      break;
+    case "TryStatement":
+      for (const child of statement.body) collectStatementCalls(child, calls);
+      if (statement.catchBody) for (const child of statement.catchBody) collectStatementCalls(child, calls);
+      break;
+    case "SwitchStatement":
+      collectCalls(statement.expression, calls);
+      for (const c of statement.cases) for (const child of c.body) collectStatementCalls(child, calls);
+      if (statement.defaultBody) for (const child of statement.defaultBody) collectStatementCalls(child, calls);
+      break;
   }
 }
 

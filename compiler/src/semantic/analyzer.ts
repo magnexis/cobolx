@@ -175,6 +175,22 @@ export class SemanticAnalyzer {
           this.analyzeStatements(statement.body, forScope, functions, macros, diagnostics, insideFunction);
           break;
         }
+        case "WhileStatement":
+          this.analyzeExpression(statement.condition, scope, functions, macros, diagnostics);
+          this.analyzeStatements(statement.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          break;
+        case "BreakStatement":
+        case "ContinueStatement":
+          break;
+        case "TryStatement":
+          this.analyzeStatements(statement.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          if (statement.catchBody) this.analyzeStatements(statement.catchBody, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          break;
+        case "SwitchStatement":
+          this.analyzeExpression(statement.expression, scope, functions, macros, diagnostics);
+          for (const c of statement.cases) this.analyzeStatements(c.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          if (statement.defaultBody) this.analyzeStatements(statement.defaultBody, new Scope(scope), functions, macros, diagnostics, insideFunction);
+          break;
       }
     }
   }
