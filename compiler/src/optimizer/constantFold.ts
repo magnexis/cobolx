@@ -86,6 +86,8 @@ function foldStatement(statement: StatementNode): StatementNode {
     case "UnsafeBlock":
     case "BlockStatement":
       return { ...statement, body: statement.body.map(foldStatement) };
+    case "ForStatement":
+      return { ...statement, from: foldExpression(statement.from), to: foldExpression(statement.to), step: foldExpression(statement.step), body: statement.body.map(foldStatement) };
     default:
       return statement;
   }

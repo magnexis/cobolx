@@ -49,6 +49,10 @@ function rewriteStatement(statement: StatementNode): StatementNode {
     case "UnsafeBlock":
     case "BlockStatement":
       return { ...statement, body: statement.body.map(rewriteStatement) };
+    case "ForStatement":
+      return { ...statement, from: rewriteExpression(statement.from), to: rewriteExpression(statement.to), step: rewriteExpression(statement.step), body: statement.body.map(rewriteStatement) };
+    default:
+      return statement;
   }
 }
 

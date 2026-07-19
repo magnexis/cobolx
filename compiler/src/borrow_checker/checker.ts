@@ -65,6 +65,12 @@ function collectStatementCalls(statement: StatementNode, calls: CallExpressionNo
     case "BlockStatement":
       for (const child of statement.body) collectStatementCalls(child, calls);
       break;
+    case "ForStatement":
+      collectCalls(statement.from, calls);
+      collectCalls(statement.to, calls);
+      collectCalls(statement.step, calls);
+      for (const child of statement.body) collectStatementCalls(child, calls);
+      break;
   }
 }
 

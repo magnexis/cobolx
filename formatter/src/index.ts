@@ -27,6 +27,8 @@ function formatExpression(expression: ExpressionNode): string {
       return `${expression.variantName}(${expression.fields.map(formatExpression).join(", ")})`;
     case "ArrayLiteral":
       return `[${expression.items.map(formatExpression).join(", ")}]`;
+    default:
+      return "";
   }
 }
 
@@ -66,6 +68,13 @@ function formatStatement(statement: StatementNode, indent = ""): string {
       return [`${indent}UNSAFE`, `${indent}BEGIN`, ...statement.body.map((child) => formatStatement(child, `${indent}  `)), `${indent}END-UNSAFE`].join("\n");
     case "BlockStatement":
       return statement.body.map((child) => formatStatement(child, indent)).join("\n");
+    case "ForStatement": {
+      const stepStr = statement.step.kind === "NumberLiteral" && statement.step.value === 1 ? "" : ` STEP ${formatExpression(statement.step)}`;
+      const bodyLines = statement.body.map((child) => formatStatement(child, `${indent}  `));
+      return [`${indent}FOR ${statement.variable} FROM ${formatExpression(statement.from)} TO ${formatExpression(statement.to)}${stepStr}`, ...bodyLines, `${indent}END-FOR`].join("\n");
+    }
+    default:
+      return "";
   }
 }
 

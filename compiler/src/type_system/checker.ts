@@ -39,6 +39,8 @@ function inferExpression(expression: ExpressionNode, scope: Scope, diagnostics: 
       return "array";
     case "BinaryExpression":
       return inferBinaryExpression(expression, scope, diagnostics);
+    default:
+      return "unknown";
   }
 }
 
@@ -93,6 +95,15 @@ export function inferProgramTypes(program: ProgramNode): { symbolTypes: Record<s
         case "BlockStatement":
           visitStatements(statement.body, { values: new Map(localScope.values), parent: localScope });
           break;
+        case "ForStatement": {
+          inferExpression(statement.from, localScope, diagnostics);
+          inferExpression(statement.to, localScope, diagnostics);
+          inferExpression(statement.step, localScope, diagnostics);
+          const forScope = { values: new Map(localScope.values), parent: localScope };
+          forScope.values.set(statement.variable, "number");
+          visitStatements(statement.body, forScope);
+          break;
+        }
       }
     }
   };

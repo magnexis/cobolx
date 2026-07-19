@@ -148,6 +148,15 @@ export class SemanticAnalyzer {
         case "BlockStatement":
           this.analyzeStatements(statement.body, new Scope(scope), functions, macros, diagnostics, insideFunction);
           break;
+        case "ForStatement": {
+          this.analyzeExpression(statement.from, scope, functions, macros, diagnostics);
+          this.analyzeExpression(statement.to, scope, functions, macros, diagnostics);
+          this.analyzeExpression(statement.step, scope, functions, macros, diagnostics);
+          const forScope = new Scope(scope);
+          forScope.declare(statement.variable);
+          this.analyzeStatements(statement.body, forScope, functions, macros, diagnostics, insideFunction);
+          break;
+        }
       }
     }
   }
